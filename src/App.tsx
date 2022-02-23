@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import cardConfig from "./card-config";
 import Card from "./components/Card";
 import Countdown from "./components/Countdown";
+import Timer from "./components/Timer";
 
 export type Card = {src: string; id: number; matched: boolean; flipped: boolean}
+const TIMER = 1000 * 30;
 
 const App = () => {  
   const thema = cardConfig['thema1'];
-  const [ready, setReady] = useState(false);
-  const [cards, setCards] = useState<Card[]>([]);
+  const [ready, setReady] = useState<boolean>(false);
   
+  const [cards, setCards] = useState<Card[]>([]);
   const [choice1, setChoice1] = useState<null|Card>(null);
   const [choice2, setChoice2] = useState<null|Card>(null);
 
@@ -23,6 +25,7 @@ const App = () => {
     setCards(randomCards);
     setChoice1(null);
     setChoice2(null);
+    setDisabled(false);
   }
 
   useEffect(() => {
@@ -36,9 +39,9 @@ const App = () => {
 
   const choiceHandler = (card: Card) => {
     if (!ready || card.matched) return;
-
     choice1 ? setChoice2(card) : setChoice1(card);
-    setCards(prevCards => prevCards.map(prevCard => {
+
+    setCards(prevCards => prevCards.map((prevCard, i, array) => {
       return (prevCard.id === card.id || choice1?.id === card.id || card.matched) ? { ...prevCard, flipped: true } : prevCard;
     }));
   }
@@ -50,7 +53,7 @@ const App = () => {
         setCards((prevCards) => prevCards.map((card) => card.src === choice1.src ? {...card, matched: true} : card));
         resetTruns();
       } else {
-        setTimeout(() => resetTruns(), 800)
+        setTimeout(() => resetTruns(), 800);
       }
     }
   }, [choice1, choice2]);
@@ -62,13 +65,24 @@ const App = () => {
     setDisabled(false);
   }
 
-  return <div id="app">
-    {ready ? <div>게임 시작!</div> : <div><Countdown start={5} end={0} callback={() => setReady(true)} /> 초 뒤 게임이 시작됩니다.</div>}
+  const onTimeout = () => {
+    // const notMatched = cards.every(({ matched }) => matched);
+    // (notMatched) ? setSuccess(true): setSuccess(false);
+  };
 
+  // console.log(cards)
+  return <div id="app">
+    <h2 style={{textAlign: 'center'}}>
+      {ready 
+      ? <div>게임 시작! <Timer time={TIMER} timeout={onTimeout} /></div> 
+      : <div><Countdown start={5} end={0} callback={() => setReady(true)} /> 초 뒤 게임이 시작됩니다.</div>
+      }
+    </h2>
+    
+    {/* <div>결과: {success ? '성공 😊' : '실패 😢'}</div> */}
     <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridGap: 20, marginTop: 60}}>
       {cards.map((card, i) => {
         const cover = thema.cover[i];
-        
         return <Card key={`card-${card.id}`} 
           card={card} 
           cover={cover.src} 
