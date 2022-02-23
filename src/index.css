@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+img {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+#app {
+  width: 720px;
+  margin: 0 auto;
+}
+
+.card {
+  position: relative;
+  height: 23.5ch;
+}
+
+.card img {
+  position: absolute;
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+  cursor: pointer;
+  will-change: transform, opacity;
+}
