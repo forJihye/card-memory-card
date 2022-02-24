@@ -30,6 +30,13 @@ const App = () => {
     setChoice2(null);
     setDisabled(false);
   }
+  
+  const resetTruns = () =>{
+    setCards(cards => cards.map(card => card.matched ? card : {...card, flipped: false}));
+    setChoice1(null);
+    setChoice2(null);
+    setDisabled(false);
+  }
 
   useEffect(() => {
     setRandomCard();
@@ -41,7 +48,7 @@ const App = () => {
   }, []);
 
   const choiceHandler = (card: Card) => {
-    if (!ready || card.matched) return;
+    if (!ready || card.matched || result.finish) return;
 
     choice1 ? setChoice2(card) : setChoice1(card);
     setCards(prevCards => prevCards.map((prevCard) => {
@@ -71,16 +78,13 @@ const App = () => {
 
   }, [choice1, choice2]);
 
-  const resetTruns = () =>{
-    setCards(cards => cards.map(card => card.matched ? card : {...card, flipped: false}));
-    setChoice1(null);
-    setChoice2(null);
-    setDisabled(false);
-  }
-
   const onTimeout = () => {
     const allMatched = cards.every(({matched}) => matched === true);
-    allMatched ? setResult({finish: true, value: true}) : setResult({finish: true, value: false});
+    if (allMatched) setResult({finish: true, value: true})
+    else {
+      setResult({finish: true, value: false});
+      setCards((prevCards) => prevCards.map((prevCard) => (!prevCard.matched && prevCard.flipped) ? {...prevCard, flipped: false} : prevCard));
+    }
   };
 
   return <div id="app">
