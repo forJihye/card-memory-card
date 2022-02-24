@@ -11,8 +11,9 @@ const format = ({min, sec}: {min: number; sec: number}) => [`${min}`.padStart(2,
 
 const Timer: FC<{
   time: number;
-  timeout: () => void
-}> = ({time, timeout, ...props}) => {
+  timeout: () => void;
+  stop?: boolean;
+}> = ({time, timeout, stop, ...props}) => {
   const [timeRemained, setTimeRemained] = useState(time);
   const formatTime = format(timeDivder(timeRemained));
   
@@ -26,6 +27,8 @@ const Timer: FC<{
         setTimeRemained((prev) => prev - 1000);
       }
     }, 1000);
+    
+    stop && clearTimeout(timer);
 
     return () => clearTimeout(timer);
   }, [timeRemained]);
